@@ -9,18 +9,36 @@ export default function Article() {
     "Tomatoes",
     "ground beef",
   ]);
-  const [recipeShown, setRecipeShown] = React.useState(false);
+  const [recipe, setRecipe] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
-  function toggleRecipeShown() {
-    setRecipeShown((prev) => !prev);
+  async function getRecipe() {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/.netlify/functions/getRecipe", {
+        method: "POST",
+        body: JSON.stringify({ ingredients: ingredients }),
+      });
+      const recipeMarkdown = await res.text();
+      setRecipe(recipeMarkdown);
+      return recipeMarkdown;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   function addIngredient(formData) {
     const newIngredient = formData.get("ingredient");
+    if (!newIngredient) return;
     setIngredients((prev) => [...prev, newIngredient]);
   }
   return (
     <main>
+      <h3 className="main-headline">
+        Enter your ingredients and watch a tasty recipe in seconds!
+      </h3>
       <form action={addIngredient} type="text" className="add-ingredient-form">
         <div className="input-group">
           <input
@@ -37,15 +55,23 @@ export default function Article() {
             Add at least 4 ingredients
           </label>
         </div>
-        <button>+ Add ingredient</button>
+        <button disabled={isLoading}>+ Add ingredient</button>
       </form>
       {ingredients.length > 0 && (
         <IngredientsList
-          toggleRecipeShown={toggleRecipeShown}
+          isLoading={isLoading}
+          getRecipe={getRecipe}
           ingredients={ingredients}
         />
       )}
-      {recipeShown && <ClaudeRecipe />}
+
+      {isLoading ? (
+        <section className="loading-container">
+          <p>Chef Claude is thinking... 🍳</p>
+        </section>
+      ) : (
+        recipe && <ClaudeRecipe recipe={recipe} />
+      )}
     </main>
   );
 }
