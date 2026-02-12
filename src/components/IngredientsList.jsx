@@ -3,8 +3,15 @@ export default function IngredientsList(props) {
     <li key={el}>{el}</li>
   ));
   return (
-    <section className="ingredientSectionContainer">
+    <section
+      className={`ingredientSectionContainer ${
+        props.isClearing ? "hidden" : ""
+      }`}
+    >
       <h2>Ingredients on hand:</h2>
+      <button onClick={props.startOver} className="clear-btn">
+        Start over
+      </button>
       <ul className="ingredients-list" aria-live="polite">
         {ingredientsListItem}
       </ul>

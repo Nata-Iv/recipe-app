@@ -7,13 +7,16 @@ export default function Article() {
     "Chicken",
     "Oregano",
     "Tomatoes",
-    "ground beef",
+    "Ground beef",
   ]);
+
   const [recipe, setRecipe] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isClearing, setIsClearing] = React.useState(false);
 
   async function getRecipe() {
     setIsLoading(true);
+
     try {
       const res = await fetch("/.netlify/functions/getRecipe", {
         method: "POST",
@@ -21,7 +24,6 @@ export default function Article() {
       });
       const recipeMarkdown = await res.text();
       setRecipe(recipeMarkdown);
-      return recipeMarkdown;
     } catch (error) {
       console.log(error);
     } finally {
@@ -34,6 +36,17 @@ export default function Article() {
     if (!newIngredient) return;
     setIngredients((prev) => [...prev, newIngredient]);
   }
+
+  function startOver() {
+    setIsClearing(true);
+
+    setTimeout(() => {
+      setIngredients([]);
+      setRecipe(null);
+      setIsClearing(false);
+    }, 500);
+  }
+
   return (
     <main>
       <h3 className="main-headline">
@@ -55,13 +68,15 @@ export default function Article() {
             Add at least 4 ingredients
           </label>
         </div>
-        <button disabled={isLoading}>+ Add ingredient</button>
+        <button disabled={isLoading}>Add ingredient</button>
       </form>
       {ingredients.length > 0 && (
         <IngredientsList
           isLoading={isLoading}
           getRecipe={getRecipe}
           ingredients={ingredients}
+          startOver={startOver}
+          isClearing={isClearing}
         />
       )}
 
@@ -70,7 +85,7 @@ export default function Article() {
           <p>Chef Claude is thinking... 🍳</p>
         </section>
       ) : (
-        recipe && <ClaudeRecipe recipe={recipe} />
+        recipe && <ClaudeRecipe recipe={recipe} isClearing={isClearing} />
       )}
     </main>
   );

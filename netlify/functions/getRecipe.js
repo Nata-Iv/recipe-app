@@ -7,9 +7,8 @@ You are an assistant that receives a list of ingredients that a user has and sug
 const hf = new HfInference(process.env.HUGGINGFACE_API_KEY);
 
 export const handler = async (event) => {
-  // 1. Предохранитель (чтобы функция не падала от пустых GET запросов)
   if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Только POST запросы разрешены" };
+    return { statusCode: 405, body: "Only POST requests are allowed" };
   }
 
   try {
@@ -33,37 +32,10 @@ export const handler = async (event) => {
       body: recipe,
     };
   } catch (err) {
-    console.error("Ошибка на сервере:", err.message);
+    console.error("Server error:", err.message);
     return {
       statusCode: 500,
-      body: "Ошибка на стороне сервера: " + err.message,
+      body: "Server error: " + err.message,
     };
   }
 };
-
-// export async function getRecipeFromMistral(ingredientsArr) {
-//   const ingredientsString = ingredientsArr.join(", ");
-//   try {
-//     const response = await hf.chatCompletion({
-//       model: "Qwen/Qwen2.5-Coder-32B-Instruct",
-//       messages: [
-//         { role: "system", content: SYSTEM_PROMPT },
-//         {
-//           role: "user",
-//           content: `I have ${ingredientsString}. Please give me a recipe!`,
-//         },
-//       ],
-//       max_tokens: 1024,
-//     });
-
-//     const recipe = response.choices[0].message.content;
-//     console.log("Успех! Рецепт получен.");
-//     console.log("Ключ загружен?", !!import.meta.env.VITE_HUGGINGFACE_API_KEY);
-
-//     return recipe;
-//   } catch (err) {
-//     console.error("Ошибка при запросе:", err.message);
-
-//     return "Сервер временно не отвечает. Пожалуйста, попробуйте еще раз через 10 секунд.";
-//   }
-// }
