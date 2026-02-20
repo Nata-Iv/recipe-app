@@ -14,6 +14,14 @@ export default function Article() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [isClearing, setIsClearing] = React.useState(false);
 
+  const recipeSection = React.useRef(null);
+
+  React.useEffect(() => {
+    if (recipe !== "" && recipeSection.current !== null) {
+      recipeSection.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [recipe]);
+
   async function getRecipe() {
     setIsLoading(true);
 
@@ -32,7 +40,7 @@ export default function Article() {
   }
 
   function addIngredient(formData) {
-    const newIngredient = formData.get("ingredient");
+    const newIngredient = formData.get("ingredient")?.trim();
     if (!newIngredient) return;
     setIngredients((prev) => [...prev, newIngredient]);
   }
@@ -72,6 +80,7 @@ export default function Article() {
       </form>
       {ingredients.length > 0 && (
         <IngredientsList
+          innerRef={recipeSection}
           isLoading={isLoading}
           getRecipe={getRecipe}
           ingredients={ingredients}

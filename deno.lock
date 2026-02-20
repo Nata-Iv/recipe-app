@@ -21,6 +21,7 @@
         "npm:eslint@^9.39.1",
         "npm:globals@^16.5.0",
         "npm:react-dom@^19.2.0",
+        "npm:react-markdown@^10.1.0",
         "npm:react@^19.2.0",
         "npm:vite@^7.2.4"
       ]
